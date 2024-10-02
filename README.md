@@ -1,4 +1,4 @@
-# account-mobile
+# account-manager
 
 ## Project setup
 ```
