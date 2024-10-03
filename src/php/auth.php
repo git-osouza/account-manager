@@ -34,11 +34,11 @@ if ($metodo === 'POST') {
 
         if (count($resultados) > 0) {
             http_response_code(200);
-            echo json_encode(["mensagem" => "Autenticado com sucesso"]);
+            echo json_encode(["authenticate" => true]);
         } else {
             http_response_code(401);
-            echo json_encode(["erro" => "Usuário ou senha inválidos"]);
-        }
+            echo json_encode(["authenticate" => false]);
+        } 
 
     } catch (PDOException $e) {
         http_response_code(500);

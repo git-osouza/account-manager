@@ -23,35 +23,20 @@
 
 
 <script>
-import axios from 'axios';
+import router from '@/router';
+import loginService from '@/services/loginService';
 
 
 export default {
-  name: 'LoginForm',
+  name: 'LoginPage',
   data() {
-    return {
-      username: '',
-      senha: '',
-      mensagem: '',
-      erro: ''
-    };
+    return {};
   },
   methods: {
     async login() {
-      try {
-        const response = await axios.post('https://account-mobile.tenhafibra.com.br/auth.php', {
-          username: this.username,
-          senha: this.senha
-        });
-        this.mensagem = response.data.mensagem;
-        this.erro = '';
-      } catch (error) {
-        if (error.response) {
-          this.erro = error.response.data.erro || 'Erro ao autenticar';
-        } else {
-          this.erro = 'Erro de rede ou servidor';
-        }
-        this.mensagem = '';
+      const isAuthenticate = await loginService.authenticate(this.username, this.senha);
+      if (isAuthenticate.sucess) {
+        router.push({ name: 'Home' });
       }
     }
   }
@@ -59,17 +44,6 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  margin: 0 auto;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-h2 {
-  text-align: center;
-
-}
-
 .form-control {
   border-radius: 25px;
   height: 50px;

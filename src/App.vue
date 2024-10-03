@@ -1,16 +1,14 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
-  <LoginForm />
+  <router-view />
 </template>
 
 <script>
-import LoginForm from './components/LoginForm.vue';
+
 
 export default {
   name: 'App',
-  components: {
-    LoginForm
-  }
+  components: {}
 }
 </script>
 
@@ -22,5 +20,16 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.container {
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+h2 {
+  text-align: center;
+
 }
 </style>
