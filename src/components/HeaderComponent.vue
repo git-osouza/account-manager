@@ -17,6 +17,9 @@
                     <RouterLink class="nav-link" to="/Cadastrar">
                         Cadastrar
                     </RouterLink>
+                    <a href="#" class="nav-link" @click="logoff">
+                        Sair
+                    </a>
                 </div>
             </div>
         </div>
@@ -24,6 +27,8 @@
 </template>
 
 <script>
+import router from '@/router';
+
 
 
 export default {
@@ -33,6 +38,10 @@ export default {
         };
     },
     methods: {
+        logoff() {
+            localStorage.removeItem('token');
+            router.push({ name: 'Login' });
+        }
     }
 };
 
