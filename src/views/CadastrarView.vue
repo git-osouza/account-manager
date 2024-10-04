@@ -46,12 +46,14 @@
 </template>
 
 <script>
+import axiosInstance from '@/services/http';
 import { reactive, onMounted } from 'vue';
 
 export default {
   name: 'CadastrarView',
   setup() {
     const insertVo = reactive({
+      id: '',
       conta: '',
       valor: '',
       parcelas: '',
@@ -59,10 +61,23 @@ export default {
     });
 
     const insert = async () => {
-      alert(JSON.stringify(insertVo));
+      for (let i = 0; i < insertVo.parcelas; i++) {
+        insertVo.id = Math.ceil(Math.random()*1000000);
+        insertVo.valor = parseFloat(insertVo.valor);
+        insertVo.parcelas = Number(insertVo.parcelas);
+        insertVo.diaVencimento = new Date();
+        const resp = await axiosInstance.post('/insert.php', insertVo);
+        console.log(resp);
+      }
+      clear();
     };
-
-    const checkToken = async () => {
+    
+    const clear = () => {
+      insertVo.id = '';
+      insertVo.conta = '';
+      insertVo.valor = '';
+      insertVo.parcelas = '';
+      insertVo.diaVencimento = '';
     };
 
     onMounted(() => {
@@ -70,8 +85,7 @@ export default {
 
     return {
       insertVo,
-      insert,
-      checkToken
+      insert
     };
   }
 };

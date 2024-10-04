@@ -1,8 +1,6 @@
 <?php
 
-$host = "firebird02-farm10.kinghost.net:/firebird/tenhafibra.gdb";
-$usuario = "tenhafibra";
-$senha = "Es986532";
+require 'connection.php';
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Credentials: true");
@@ -20,8 +18,7 @@ if ($metodo === 'POST') {
     $segredo = 'Es986532@@';
 
     try {
-        $conn = new PDO("firebird:dbname=$host", $usuario, $senha);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $conn = getConnection();
 
         $dados_post = json_decode(file_get_contents("php://input"), true);
 
@@ -57,7 +54,7 @@ if ($metodo === 'POST') {
 
     } catch (PDOException $e) {
         http_response_code(500);
-        echo json_encode(["erro" => "Erro ao conectar ao banco de dados: " . $e->getMessage()]);
+        echo json_encode(["erro" => "Erro de conexao: " . $e->getMessage()]);
     }
 }
 
