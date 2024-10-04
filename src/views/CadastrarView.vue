@@ -1,22 +1,93 @@
 <template>
   <div class="container">
-    <h2 class="pb-4">WELCOME A CADASTRAR</h2>
+    <form @submit.prevent="insert">
+      <div class="form-floating mb-3">
+        <input type="text" v-model="insertVo.conta" class="form-control" id="floatingInput" placeholder="Nome Conta"
+          required>
+        <label for="floatingInput">Conta</label>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <div class="form-floating mb-3">
+            <input type="text" v-model="insertVo.valor" class="form-control" id="floatingInput" placeholder="Valor"
+              required>
+            <label for="floatingInput">Valor</label>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-floating mb-3">
+            <input type="number" v-model="insertVo.parcelas" class="form-control" id="floatingInput"
+              placeholder="Nº Parcelas" required>
+            <label for="floatingInput">Nº Parcelas</label>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <div class="form-floating mb-3">
+            <input type="number" v-model="insertVo.diaVencimento" class="form-control" id="floatingInput"
+              placeholder="Vencimento" required>
+            <label for="floatingInput">Venc.</label>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-dark">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy"
+            viewBox="0 0 16 16">
+            <path d="M11 2H9v3h2z" />
+            <path
+              d="M1.5 0h11.586a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0M1 1.5v13a.5.5 0 0 0 .5.5H2v-4.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V15h.5a.5.5 0 0 0 .5-.5V2.914a.5.5 0 0 0-.146-.353l-1.415-1.415A.5.5 0 0 0 13.086 1H13v4.5A1.5 1.5 0 0 1 11.5 7h-7A1.5 1.5 0 0 1 3 5.5V1H1.5a.5.5 0 0 0-.5.5m3 4a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V1H4zM3 15h10v-4.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5z" />
+          </svg>
+        </button>
+      </div>
+    </form>
   </div>
 </template>
 
-
 <script>
-
+import { reactive, onMounted } from 'vue';
 
 export default {
   name: 'CadastrarView',
-  data() {
-    return {
+  setup() {
+    const insertVo = reactive({
+      conta: '',
+      valor: '',
+      parcelas: '',
+      diaVencimento: '',
+    });
+
+    const insert = async () => {
+      alert(JSON.stringify(insertVo));
     };
-  },
-  methods: {
+
+    const checkToken = async () => {
+    };
+
+    onMounted(() => {
+    });
+
+    return {
+      insertVo,
+      insert,
+      checkToken
+    };
   }
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.form-control {
+  border-radius: 15px;
+}
+
+.btn {
+  border-radius: 50%;
+  background-color: #34495e;
+}
+
+.bi-floppy {
+  color: #41b883;
+}
+</style>

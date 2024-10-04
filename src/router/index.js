@@ -17,21 +17,30 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('token');
+
+  if (to.name === 'Login' && token) {
+    return next({ name: 'Listar' });
+  }
+
   if (to.name !== 'Login' && !token) {
-    next({ name: 'Login' });
-  } else {
+    return next({ name: 'Login' });
+  }
+
+  if (token) {
     try {
       const validation = await validateToken(token);
       if (validation.valid) {
-        next();
+        return next();
       } else {
-        next({ name: 'Login' });
+        localStorage.removeItem('token');
+        return next({ name: 'Login' });
       }
     } catch (error) {
-      next({ name: 'Login' });
+      localStorage.removeItem('token');
+      return next({ name: 'Login' });
     }
   }
+  return next();
 });
-
 
 export default router;

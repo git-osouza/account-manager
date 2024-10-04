@@ -1,8 +1,10 @@
 <template>
   <div class="container">
-    <HeaderComponent v-if="!isLoginPage"/>
-    <router-view />
-    <FooterComponent v-if="!isLoginPage"/>
+    <HeaderComponent v-if="!isLoginPage" />
+    <div class="content">
+      <router-view />
+    </div>
+    <FooterComponent v-if="!isLoginPage" />
   </div>
 </template>
 
@@ -40,6 +42,10 @@ export default {
   margin-top: 10px;
   margin: 5px;
   padding: 5px;
+}
+
+.content {
+  padding-top: 50px;
 }
 
 .container {
