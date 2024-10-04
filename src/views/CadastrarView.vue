@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h2 class="pb-4">WELCOME A HOME</h2>
+    <h2 class="pb-4">WELCOME A CADASTRAR</h2>
   </div>
 </template>
 
@@ -9,7 +9,7 @@
 
 
 export default {
-  name: 'HomePage',
+  name: 'CadastrarView',
   data() {
     return {
     };

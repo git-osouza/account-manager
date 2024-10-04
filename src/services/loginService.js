@@ -1,27 +1,25 @@
-import axios from "axios";
+import axiosInstance from './http';
 
-const apiAuth = 'https://account-mobile.tenhafibra.com.br/auth.php';
+export const login = async (user) => {
+  try {
+    const response = await axiosInstance.post('/auth.php', user);
+    return response.data;
+  } catch (error) {
+    console.error('Erro no login:', error);
+    throw error;
+  }
+};
 
-
-const loginService = {
-
-    async authenticate(username, senha) {
-        if (username && senha) {
-            try {
-                const res = await axios.post(apiAuth, {
-                    username: username,
-                    senha: senha
-                });
-                return { sucess: res.data.authenticate };
-            } catch (error) {
-                console.error('Erro ao autenticar', error);
-                return { sucess: false };
-            }
-        }
-        return { sucess: false };
-    }
-
-}
-
-
-export default loginService;
+export const validateToken = async (token) => {
+  try {
+    const response = await axiosInstance.get('/validate.php', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Erro na validação do token:', error);
+    throw error;
+  }
+};

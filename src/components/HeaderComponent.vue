@@ -2,7 +2,7 @@
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
-                <img src="../assets/logo.png" alt="account-manager" width="30" height="24">
+                <img src="../assets/prancheta.png" alt="account-manager" width="35" height="36">
                 Gerenciador de contas
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
@@ -11,10 +11,12 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    <a class="nav-link" href="#">Features</a>
-                    <a class="nav-link" href="#">Pricing</a>
-                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                    <RouterLink class="nav-link" to="/Listar">
+                        Listar
+                    </RouterLink>
+                    <RouterLink class="nav-link" to="/Cadastrar">
+                        Cadastrar
+                    </RouterLink>
                 </div>
             </div>
         </div>
