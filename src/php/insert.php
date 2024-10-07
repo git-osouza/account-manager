@@ -26,44 +26,33 @@ if ($metodo === 'POST') {
             exit();
         }
 
-        $id = $dados_post['id'];
+        $id = (int)$dados_post['id'];
         $conta = $dados_post['conta'];
         $valor = $dados_post['valor'];
         $parcelas = (int)$dados_post['parcelas'];
-        $diaVencimento = $dados_post['diaVencimento'];
-        $dt_pagamentoParam = NULL; // Se não houver valor, pode permanecer nulo.
+        $diaVencimento = (int)$dados_post['diaVencimento'];
         $createdAt = date('Y-m-d H:i:s');
+        
+        $stmt = $conn->prepare("INSERT INTO CONTAS (id, ds_conta, valor, parcelas, dia_vencimento, created_at) 
+        VALUES (:id, :ds_conta, :valor, :parcelas, :dia_vencimento, :created_at)");
 
-        $sql = "INSERT INTO CONTAS (id, ds_conta, valor, parcelas, dia_vencimento, dt_pagamento, created_at) VALUES (
-            $id, 
-            '$conta', 
-            $valor, 
-            $parcelas, 
-            $diaVencimento, 
-            NULL, 
-            '$createdAt')";
-
-echo json_encode(["sql" => $sql]);
-exit();
-
-        $stmt = $conn->prepare("INSERT INTO CONTAS (id, ds_conta, valor, parcelas, dia_vencimento, dt_pagamento, created_at) VALUES (:id, :ds_conta, :valor, :parcelas, :dia_vencimento, :dt_pagamento, :created_at)");
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':ds_conta', $conta);
         $stmt->bindParam(':valor', $valor);
         $stmt->bindParam(':parcelas', $parcelas);
         $stmt->bindParam(':dia_vencimento', $diaVencimento);
-        $stmt->bindParam(':dt_pagamento', $dt_pagamentoParam);
         $stmt->bindParam(':created_at', $createdAt);
-
-        $stmt->execute();
-
-        $idConta = $conn->lastInsertId();
         
-        http_response_code(201);
-        echo json_encode(["success" => true, "id" => $idConta]);
+        
+        if ($stmt->execute()) {
+            http_response_code(201);
+            echo json_encode(["success" => true, "id" => $id]);
+        } else {
+            throw new PDOException("Falha na execução do INSERT");
+        }
         
     } catch (PDOException $e) {
-        http_response_code(500); // Corrigido aqui
+        http_response_code(500);
         echo json_encode([
             "erro" => "Erro de conexão: " . $e->getMessage(),
             "codigo" => $e->getCode(),
