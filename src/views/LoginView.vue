@@ -44,7 +44,7 @@ export default {
       try {
         const { token } = await login(user);
         localStorage.setItem('token', token);
-        router.push({ name: 'Listar' });
+        router.push({ name: 'Cadastrar' });
       } catch (error) {
         console.error('Erro ao fazer login', error);
         toast.error('Usuário ou senha inválidos!');
@@ -58,7 +58,7 @@ export default {
           const result = await validateToken(token);
           if (result.valid) {
             console.log('Token válido!');
-            router.push({ name: 'Listar' });
+            router.push({ name: 'Cadastrar' });
           } else {
             console.log('Token inválido!');
             localStorage.removeItem('token');
