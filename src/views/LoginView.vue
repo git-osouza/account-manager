@@ -29,10 +29,12 @@
 import { reactive, onMounted } from 'vue';
 import { login, validateToken } from '@/services/loginService';
 import router from '@/router';
+import { useToast } from "vue-toastification";
 
 export default {
   name: 'LoginView',
   setup() {
+    const toast = useToast();
     const user = reactive({
       username: '',
       senha: ''
@@ -45,6 +47,7 @@ export default {
         router.push({ name: 'Listar' });
       } catch (error) {
         console.error('Erro ao fazer login', error);
+        toast.error('Usuário ou senha inválidos!');
       }
     };
 

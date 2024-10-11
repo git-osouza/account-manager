@@ -48,10 +48,12 @@
 <script>
 import axiosInstance from '@/services/http';
 import { reactive, onMounted } from 'vue';
+import { useToast } from "vue-toastification";
 
 export default {
   name: 'CadastrarView',
   setup() {
+    const toast = useToast();
     const insertVo = reactive({
       id: '',
       conta: '',
@@ -61,13 +63,23 @@ export default {
     });
 
     const insert = async () => {
+      let arrInsert = [];
       for (let i = 0; i < insertVo.parcelas; i++) {
         insertVo.id = Number(Math.ceil(Math.random() * 1000000));
         insertVo.valor = parseFloat(insertVo.valor.replace(',', '.')).toFixed(2);
         insertVo.parcelas = Number(insertVo.parcelas);
         insertVo.diaVencimento = Number(insertVo.diaVencimento);
-        const resp = await axiosInstance.post('/insert.php', insertVo);
-        console.log('aqui', resp);
+        const resp = (await axiosInstance.post('/insert.php', insertVo)).data;
+        arrInsert.push(resp.success);
+      }
+
+      if(arrInsert.length > 0){
+        const index = arrInsert.indexOf(false);
+        if(index === -1){
+          toast.success('Registro inserido com sucesso!');
+        }else{
+          toast.error('Erro ao inserir o registro');
+        }
       }
       clear();
     };
