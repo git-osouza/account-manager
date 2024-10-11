@@ -62,16 +62,16 @@ export default {
 
     const insert = async () => {
       for (let i = 0; i < insertVo.parcelas; i++) {
-        insertVo.id = Number(Math.ceil(Math.random()*1000000));
+        insertVo.id = Number(Math.ceil(Math.random() * 1000000));
         insertVo.valor = parseFloat(insertVo.valor.replace(',', '.')).toFixed(2);
         insertVo.parcelas = Number(insertVo.parcelas);
         insertVo.diaVencimento = Number(insertVo.diaVencimento);
         const resp = await axiosInstance.post('/insert.php', insertVo);
-        console.log(resp);
+        console.log('aqui', resp);
       }
       clear();
     };
-    
+
     const clear = () => {
       insertVo.id = '';
       insertVo.conta = '';
