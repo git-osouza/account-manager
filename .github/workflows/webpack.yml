@@ -37,8 +37,6 @@ jobs:
       run: |
         git clone https://git-osouza:${{ secrets.TOKEN_TESTE_DEPLOY }}@github.com/git-osouza/account-manager-deploy.git deploy
         rm -rf deploy/*
-        mv php/* deploy/
-        mv php/.* deploy/ 2>/dev/null || :
         mv dist/* deploy/
         mv dist/.* deploy/ 2>/dev/null || :
         rm -rf deploy/dist
