@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiAuth = 'https://account-manager.tenhafibra.com.br';
+const apiAuth = 'https://account-manager.tenhafibra.com.br/php';
 
 
 
