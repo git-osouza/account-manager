@@ -11,6 +11,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
+                    <RouterLink class="nav-link" to="/Dashboard">
+                        Dashboard
+                    </RouterLink>
                     <RouterLink class="nav-link" to="/Listar">
                         Listar
                     </RouterLink>
@@ -27,9 +30,7 @@
 </template>
 
 <script>
-import router from '@/router';
-
-
+import { logoff } from '@/services/auth/loginService';
 
 export default {
     name: 'HeaderComponent',
@@ -38,9 +39,8 @@ export default {
         };
     },
     methods: {
-        logoff() {
-            localStorage.removeItem('token');
-            router.push({ name: 'Login' });
+        async logoff() {
+            await logoff();
         }
     }
 };
