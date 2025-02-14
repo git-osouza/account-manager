@@ -10,11 +10,9 @@
 
 export default {
   name: 'ListarView',
-  data() {
+  setup() {
     return {
     };
-  },
-  methods: {
   }
 };
 </script>

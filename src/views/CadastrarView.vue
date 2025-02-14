@@ -9,8 +9,8 @@
       <div class="row">
         <div class="col-6">
           <div class="form-floating mb-3">
-            <input type="text" v-model="insertVo.valor" class="form-control" id="floatingInput" placeholder="Valor"
-              required>
+            <input type="text" v-model="parcelas.valor_parcela" class="form-control" id="floatingInput"
+              placeholder="Valor" required>
             <label for="floatingInput">Valor</label>
           </div>
         </div>
@@ -32,7 +32,7 @@
         </div>
         <div class="col-6">
           <div class="form-floating mb-3">
-            <input type="date" v-model="insertVo.dt_vencimento" class="form-control" id="floatingInput"
+            <input type="date" v-model="parcelas.dt_vencimento" class="form-control" id="floatingInput"
               placeholder="Vencimento" required>
             <label for="floatingInput">Data 1° vencimento</label>
           </div>
@@ -70,21 +70,40 @@ export default {
   name: 'CadastrarView',
   setup() {
     const toast = useToast();
-    const parcelas = reactive({ nr_parcelas: '' });
+    const parcelas = reactive({
+      nr_parcelas: '',
+      valor_parcela: '',
+      dt_vencimento: '',
+      status: 'Pendente'
+    });
     const insertVo = reactive({
       ds_nome: '',
-      valor: '',
-      dia_vencimento: '',
-      dt_vencimento: ''
+      valor_total: '',
+      dia_vencimento: ''
     });
 
     async function insertMultipleAccounts() {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user) {
-        const primeiroVencimento = new Date(insertVo.dt_vencimento);
+        const { data: accountResult, error: accountError } = await supabase
+          .from('account')
+          .insert({
+            ds_nome: insertVo.ds_nome,
+            valor_total: parcelas.valor_parcela * parcelas.nr_parcelas,
+            dia_vencimento: insertVo.dia_vencimento,
+            user_id: user.id
+          })
+          .select();
 
-        const accountsWithUserId = new Array(Number(parcelas.nr_parcelas)).fill(0).map((_, index) => {
+        if (accountError) {
+          console.error('Erro ao inserir contas', accountError);
+          toast.error('Ocorreu algum erro ao inserir as contas');
+          return null;
+        }
+
+        const primeiroVencimento = new Date(parcelas.dt_vencimento);
+        const accountsParcelas = new Array(Number(parcelas.nr_parcelas)).fill(0).map((_, index) => {
           let dataParcela;
 
           if (index === 0) {
@@ -98,33 +117,35 @@ export default {
           }
 
           return {
-            ...insertVo,
-            user_id: user.id,
-            dt_vencimento: dataParcela
+            id_account: accountResult[0].id,
+            numero_parcela: index + 1,
+            valor_parcela: parcelas.valor_parcela,
+            dt_vencimento: dataParcela,
+            status: parcelas.status
           };
         });
 
-        const { error } = await supabase
-          .from('account')
-          .insert(accountsWithUserId);
-
-        if (error) {
-          console.error('Erro ao inserir contas', error);
-          toast.error('Ocorreu algum erro ao inserir as contas');
+        const { error: parcelasError } = await supabase
+          .from('account_parcelas')
+          .insert(accountsParcelas);
+        
+        if (parcelasError) {
+          console.error('Erro ao inserir parcelas', parcelasError);
+          toast.error('Ocorreu algum erro ao inserir as parcelas');
           return null;
-        } else {
-          toast.success('Contas inseridas com sucesso!');
-          clear();
         }
+        toast.success('Contas inseridas com sucesso');
+        clear();
       }
     }
 
     const clear = () => {
       insertVo.ds_nome = '';
-      insertVo.valor = '';
-      parcelas.nr_parcelas = '';
+      insertVo.valor_total = '';
       insertVo.dia_vencimento = '';
-      insertVo.dt_vencimento = '';
+      parcelas.nr_parcelas = '';
+      parcelas.valor_parcela = '';
+      parcelas.dt_vencimento = '';
     };
 
     onMounted(() => {
