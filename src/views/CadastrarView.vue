@@ -82,10 +82,8 @@ export default {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user) {
-        // Converte a data do primeiro vencimento para um objeto Date
         const primeiroVencimento = new Date(insertVo.dt_vencimento);
 
-        // Cria um array para armazenar os registros das parcelas
         const accountsWithUserId = new Array(Number(parcelas.nr_parcelas)).fill(0).map((_, index) => {
           let dataParcela;
 
@@ -93,14 +91,12 @@ export default {
             // Primeira parcela: usa a data do primeiro vencimento
             dataParcela = new Date(primeiroVencimento);
           } else {
-            // Parcelas subsequentes: usa o dia fixo e incrementa o mês
+            // Parcelas subsequentes: usa o dia fixo e incrementa o mês conforme as parcelas
             dataParcela = new Date(primeiroVencimento);
-            dataParcela.setMonth(primeiroVencimento.getMonth() + index); // Adiciona index meses
-            dataParcela.setDate(insertVo.dia_vencimento - 1); // Define o dia fixo
+            dataParcela.setMonth(primeiroVencimento.getMonth() + index);
+            dataParcela.setDate(insertVo.dia_vencimento - 1);
           }
 
-
-          // Retorna o objeto da parcela
           return {
             ...insertVo,
             user_id: user.id,
@@ -123,15 +119,6 @@ export default {
       }
     }
 
-    // Função para validar a data
-    function isValidDate(dateString) {
-      const regex = /^\d{4}-\d{2}-\d{2}$/; // Formato YYYY-MM-DD
-      if (!regex.test(dateString)) return false; // Verifica o formato
-
-      const date = new Date(dateString);
-      return !isNaN(date.getTime()); // Verifica se a data é válida
-    }
-
     const clear = () => {
       insertVo.ds_nome = '';
       insertVo.valor = '';
@@ -147,8 +134,7 @@ export default {
       insertVo,
       parcelas,
       clear,
-      insertMultipleAccounts,
-      isValidDate
+      insertMultipleAccounts
     };
   }
 };
