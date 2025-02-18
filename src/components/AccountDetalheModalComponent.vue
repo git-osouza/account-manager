@@ -44,8 +44,10 @@ export default {
     },
     methods: {
         formattedValue(value) {
-            console.log(value);
-            return `R$ ${value.toFixed(2).replace('.', ',')}`;
+            return new Intl.NumberFormat("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+            }).format(value);
         }
     },
     props: {
