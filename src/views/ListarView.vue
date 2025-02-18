@@ -23,6 +23,7 @@
             <th>Nº parcela</th>
             <th>Valor parcela</th>
             <th>Data vencimento</th>
+            <th>Data pagamento</th>
             <th>Status</th>
             <th></th>
           </tr>
@@ -34,17 +35,45 @@
             </td>
             <td> {{ formattedValue(parcela.valor_total) }}</td>
             <td> {{ parcela.dia_vencimento }} </td>
-            <td> {{ parcela.numero_parcela }}</td>
-            <td> {{ formattedValue(parcela.valor_parcela) }}</td>
-            <td> {{ parcela.dt_vencimento }}</td>
-            <td> {{ parcela.status }}</td>
+            <td>{{ parcela.numero_parcela }}</td>
+
+            <td>
+              <input v-if="parcela.isEditingValor_parcela" v-model="parcela.valor_parcela"
+                @blur="saveEdit(parcela, 'valor_parcela')" type="number" class="form-control" />
+              <span v-else @click="edit(parcela, 'valor_parcela')" class="text-link">{{
+                formattedValue(parcela.valor_parcela) }}</span>
+            </td>
+
+            <td>
+              <input v-if="parcela.isEditingDt_vencimento" v-model="parcela.dt_vencimento"
+                @blur="saveEdit(parcela, 'dt_vencimento')" type="date" class="form-control" />
+              <span v-else @click="edit(parcela, 'dt_vencimento')" class="text-link">{{ parcela.dt_vencimento }}</span>
+            </td>
+
+            <td>
+              <input v-if="parcela.isEditingDt_pagamento" v-model="parcela.dt_pagamento"
+                @blur="saveEdit(parcela, 'dt_pagamento')" type="date" class="form-control" />
+              <span v-else @click="edit(parcela, 'dt_pagamento')" class="text-link">
+                {{ parcela.dt_pagamento !== null ? parcela.dt_pagamento : 0 }}
+              </span>
+            </td>
+
+            <td>
+              <select v-if="parcela.isEditingStatus" v-model="parcela.status" @blur="saveEdit(parcela, 'status')" class="form-select">
+                <option value="Pendente">Pendente</option>
+                <option value="Pago">Pago</option>
+                <option value="Atrasado">Atrasado</option>
+              </select>
+              <span v-else @click="edit(parcela, 'status')" class="text-link">{{ parcela.status }}</span>
+            </td>
+
             <td>
               <button class="btn btn-link text-dark fw-bold p-0" style="text-decoration: none"
-                @click="verDetalhes(parcela.id)">
+                @click="deletarParcela(parcela.id)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                  class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                  class="bi bi-trash-fill" viewBox="0 0 16 16">
                   <path
-                    d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                    d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
                 </svg>
               </button>
             </td>
@@ -54,9 +83,6 @@
       <p v-else class="text-center mt-3">Nenhuma conta encontrada para este mês.</p>
     </div>
 
-    <AccountDetalheModalComponent v-if="isModalVisible" :show="isModalVisible" :accountsDetail="accountsDetail"
-    @close="fecharModal" size="xl" />
-
   </div>
 </template>
 
@@ -64,20 +90,16 @@
 import { ref, computed } from "vue";
 import { useToast } from "vue-toastification";
 import supabase from "@/utils/supabase";
-import AccountDetalheModalComponent from '@/components/AccountDetalheModalComponent.vue';
 
 export default {
   name: "ListarView",
   components: {
-    AccountDetalheModalComponent
   },
   setup() {
     const toast = useToast();
     const loading = ref(true);
     const error = ref(null);
     const accounts = ref([]);
-    const accountsDetail = ref([]);
-    const isModalVisible = ref(false);
 
     const months = computed(() => {
       return [
@@ -130,12 +152,11 @@ export default {
                 numero_parcela: null,
                 valor_parcela: null,
                 dt_vencimento: null,
+                dt_pagamento: null,
                 status: "Sem parcelas",
               }];
             }
           }).flat();
-
-          console.log(result);
 
           accounts.value = result;
         }
@@ -148,26 +169,17 @@ export default {
       }
     }
 
-
-    async function verDetalhes(conta) {
-      console.log(conta)
-
+    async function deletarParcela(parcela) {
       const accountsParcelas = await supabase
         .from('account_parcelas')
-        .select('*')
-        .eq('id_account', conta)
-        .order('created_at', { ascending: false });
+        .delete()
+        .eq('id', parcela);
 
       if (accountsParcelas.error) {
         toast.error('Ocorreu um erro ao buscar as contas parcelas');
       }
 
-      accountsDetail.value = accountsParcelas.data;
-      isModalVisible.value = true;
-    }
-
-    function fecharModal() {
-      isModalVisible.value = false;
+      fetchAccounts();
     }
 
     function formattedValue(value) {
@@ -177,26 +189,56 @@ export default {
       }).format(value);
     }
 
-    const filteredAccounts = computed(() => {
-      return accounts.value;
-    });
+    function edit(parcela, field) {
+      parcela[`isEditing${field.charAt(0).toUpperCase() + field.slice(1)}`] = true;
+      parcela[`original${field.charAt(0).toUpperCase() + field.slice(1)}`] = parcela[field];
+    }
+
+    async function saveEdit(parcela, field) {
+      const originalValue = parcela[`original${field.charAt(0).toUpperCase() + field.slice(1)}`];
+      const newValue = parcela[field];
+
+      if (originalValue !== newValue) {
+        const { error } = await supabase
+          .from('account_parcelas')
+          .update({ [field]: newValue })
+          .eq('id', parcela.id);
+
+        if (error) {
+          toast.error("Ocorreu um erro ao salvar a alteração");
+        } else {
+          toast.success("Alteração salva com sucesso!");
+        }
+      }
+
+      parcela[`isEditing${field.charAt(0).toUpperCase() + field.slice(1)}`] = false;
+    }
+
 
     return {
       accounts,
-      accountsDetail,
       months,
       selectedMonth,
       loading,
       error,
-      isModalVisible,
-      fecharModal,
       formattedValue,
-      filteredAccounts,
       fetchAccounts,
-      verDetalhes
+      deletarParcela,
+      edit,
+      saveEdit
     };
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.text-link {
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: node;
+}
+
+.text-link:hover {
+  color: #0056b3;
+}
+</style>
