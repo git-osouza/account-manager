@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-
     <h2 class="text-center mb-4">Minhas Contas</h2>
 
     <div v-if="loading" class="text-center">
@@ -23,14 +22,12 @@
         <tbody>
           <tr v-for="(conta) in accounts" :key="conta.id">
             <td>
-              <button 
-                class="btn btn-link text-primary fw-bold p-0" 
-                style="text-decoration: none"
+              <button class="btn btn-link text-primary fw-bold p-0" style="text-decoration: none"
                 @click="verDetalhes(conta.id)">
                 {{ conta.ds_nome }}
               </button>
             </td>
-            <td>R$ {{ conta.valor_total }}</td>
+            <td> {{ formattedValue(conta.valor_total) }}</td>
             <td class="text-center">
               {{ conta.dia_vencimento }}
             </td>
@@ -39,44 +36,9 @@
       </table>
     </div>
 
-    <!-- Modal de Detalhes -->
-    <div v-if="selectedAccount" class="modal fade show d-block" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Detalhes da Conta</h5>
-            <button type="button" class="btn-close" @click="fecharModal"></button>
-          </div>
-          <div class="modal-body">
-            <div class="table-responsive">
-              <table v-if="accounts.length > 0" class="table table-striped table-hover">
-                <thead class="table-dark" style="font-size: small;">
-                  <tr>
-                    <th>Conta</th>
-                    <th>Valor</th>
-                    <th>Dia venc.</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(conta) in accounts" :key="conta.id">
-                    <td>
-                      {{ conta.ds_nome }}
-                    </td>
-                    <td>R$ {{ conta.valor_total }}</td>
-                    <td class="text-center">
-                      {{ conta.dia_vencimento }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <AccountDetalheModalComponent v-if="isModalVisible" :show="isModalVisible" :accountsDetail="accountsDetail"
+      @close="fecharModal" size="xl" />
 
-    <!-- Fundo escuro da modal -->
-    <div v-if="selectedAccount" class="modal-backdrop fade show"></div>
   </div>
 </template>
 
@@ -86,15 +48,22 @@
 import { ref, onMounted } from 'vue';
 import { useToast } from "vue-toastification";
 import supabase from '@/utils/supabase';
+import AccountDetalheModalComponent from '@/components/AccountDetalheModalComponent.vue';
 
 export default {
   name: 'ListarView',
+  components: {
+    AccountDetalheModalComponent
+  },
   setup() {
     const toast = useToast();
-    const accounts = ref([]);
     const loading = ref(true);
     const error = ref(null);
-    const selectedAccount = ref(null);
+    const accounts = ref([]);
+
+
+    const accountsDetail = ref([]);
+    const isModalVisible = ref(false);
 
     async function getAccountsByIdUserAutenticated() {
       try {
@@ -126,23 +95,43 @@ export default {
       }
     }
 
-    function verDetalhes(conta) {
-      selectedAccount.value = conta;
+    async function verDetalhes(conta) {
+      console.log(conta)
+
+      const accountsParcelas = await supabase
+        .from('account_parcelas')
+        .select('*')
+        .eq('id_account', conta)
+        .order('created_at', { ascending: false });
+
+      if (accountsParcelas.error) {
+        toast.error('Ocorreu um erro ao buscar as contas parcelas');
+      }
+
+      accountsDetail.value = accountsParcelas.data;
+      isModalVisible.value = true;
     }
 
     function fecharModal() {
-      selectedAccount.value = null;
+      isModalVisible.value = false;
     }
 
     onMounted(getAccountsByIdUserAutenticated);
+
+    function formattedValue(value) {
+            console.log(value);
+            return `R$ ${value.toFixed(2).replace('.', ',')}`;
+    }
 
     return {
       accounts,
       loading,
       error,
       verDetalhes,
-      selectedAccount,
-      fecharModal
+      fecharModal,
+      accountsDetail,
+      isModalVisible,
+      formattedValue
     };
   }
 

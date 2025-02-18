@@ -16,6 +16,7 @@ module.exports = {
         "vue"
     ],
     "rules": {
-        "vue/multi-workd-component-names":0
+        "vue/multi-workd-component-names":0,
+        "vue/html-indent": false
     }
 };

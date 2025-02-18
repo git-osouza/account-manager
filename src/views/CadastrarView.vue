@@ -128,7 +128,7 @@ export default {
         const { error: parcelasError } = await supabase
           .from('account_parcelas')
           .insert(accountsParcelas);
-        
+
         if (parcelasError) {
           console.error('Erro ao inserir parcelas', parcelasError);
           toast.error('Ocorreu algum erro ao inserir as parcelas');
