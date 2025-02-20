@@ -1,10 +1,32 @@
 <template>
   <div class="container">
     <form @submit.prevent="insertMultipleAccounts">
-      <div class="form-floating mb-3">
-        <input type="text" v-model="insertVo.ds_nome" class="form-control" id="floatingInput" placeholder="Nome Conta"
-          required>
-        <label for="floatingInput">Nome conta</label>
+      <div class="row">
+        <div class="col-6">
+          <div class="form-floating mb-3">
+            <select v-model="insertVo.categoria" class="form-select" id="floatingSelect" required>
+              <option disabled value="">Selecione uma categoria</option>
+              <option value="despesas-fixas">🏠 Despesas Fixas</option>
+              <option value="transporte">🚗 Transporte</option>
+              <option value="alimentacao">🛒 Alimentação</option>
+              <option value="saude">🩺 Saúde</option>
+              <option value="educacao">🎓 Educação</option>
+              <option value="dividas-pagamentos">💳 Dívidas e Pagamentos</option>
+              <option value="lazer-entretenimento">🎉 Lazer e Entretenimento</option>
+              <option value="manutencao-casa">🛠️ Manutenção e Casa</option>
+              <option value="despesas-pessoais">👔 Despesas Pessoais</option>
+              <option value="investimentos-poupanca">📈 Investimentos e Poupança</option>
+            </select>
+            <label for="floatingSelect">Categoria</label>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-floating mb-3">
+            <input type="text" v-model="insertVo.ds_nome" class="form-control" id="floatingInput"
+              placeholder="Nome Conta" required>
+            <label for="floatingInput">Nome conta</label>
+          </div>
+        </div>
       </div>
       <div class="row">
         <div class="col-6">
@@ -78,6 +100,7 @@ export default {
     });
     const insertVo = reactive({
       ds_nome: '',
+      categoria: '',
       valor_total: '',
       dia_vencimento: ''
     });
@@ -92,7 +115,8 @@ export default {
             ds_nome: insertVo.ds_nome,
             valor_total: parcelas.valor_parcela * parcelas.nr_parcelas,
             dia_vencimento: insertVo.dia_vencimento,
-            user_id: user.id
+            user_id: user.id,
+            categoria: insertVo.categoria
           })
           .select();
 
@@ -139,10 +163,18 @@ export default {
       }
     }
 
+    function formattedValue(value) {
+      return new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(value);
+    }
+
     const clear = () => {
       insertVo.ds_nome = '';
       insertVo.valor_total = '';
       insertVo.dia_vencimento = '';
+      insertVo.categoria = '';
       parcelas.nr_parcelas = '';
       parcelas.valor_parcela = '';
       parcelas.dt_vencimento = '';
@@ -155,7 +187,8 @@ export default {
       insertVo,
       parcelas,
       clear,
-      insertMultipleAccounts
+      insertMultipleAccounts,
+      formattedValue
     };
   }
 };

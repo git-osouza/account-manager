@@ -142,6 +142,7 @@ export default {
                 ds_nome: conta.ds_nome,
                 valor_total: conta.valor_total,
                 dia_vencimento: conta.dia_vencimento,
+                status: parcela.dt_pagamento ? "Pago" : validateStatus(parcela.dt_vencimento)
               }));
             } else {
               return [{
@@ -212,6 +213,15 @@ export default {
       }
 
       parcela[`isEditing${field.charAt(0).toUpperCase() + field.slice(1)}`] = false;
+    }
+
+    function validateStatus(dataVencimento){
+      const dataAtual = new Date();
+      const dataVencimentoFormatada = new Date(dataVencimento);
+      if(dataVencimentoFormatada < dataAtual){
+        return 'Atrasado';
+      }
+      return 'Pendente';
     }
 
 
