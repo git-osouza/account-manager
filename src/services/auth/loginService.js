@@ -6,11 +6,10 @@ const toast = useToast();
 
 export const validateAutentication = async () => {
   try {
-    const {data: { user }} = await supabase.auth.getUser();
-    if(!user) {
-      return null;
+    const authenticated = localStorage.getItem('authenticated');
+    if(authenticated === 'true') {
+      return true;
     }
-    return user.role === 'authenticated' ? true : false;
   } catch (error) {
     console.error('Erro na validação de autenticação:', error);
   }
@@ -19,6 +18,7 @@ export const validateAutentication = async () => {
 export const logoff = async () => {
   try {
     await supabase.auth.signOut();
+    localStorage.setItem('authenticated', false);
     router.push({ name: 'Login' });
   } catch (error) {
     console.error('Erro no logoff:', error);
@@ -35,6 +35,7 @@ export const signInWithPassword = async (email, password) => {
       console.error('Erro ao fazer login com email e senha', error);
       toast.error('Erro ao fazer login com e-mail e senha');
     } else {
+      localStorage.setItem('authenticated', true);
       router.push({ name: 'Cadastrar' });
     }
   } catch (err) {
@@ -53,6 +54,7 @@ export const signInWithOAuth = async (provider) => {
       console.error(`Erro ao fazer login com ${provider}`, error);
       toast.error(`Erro ao fazer login com ${provider}`);
     } else {
+      localStorage.setItem('authenticated', true);
       router.push({ name: 'Cadastrar' });
     }
   } catch (err) {

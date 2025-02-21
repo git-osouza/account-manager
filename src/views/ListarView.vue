@@ -18,7 +18,6 @@
         <thead class="table-dark" style="font-size: small;">
           <tr>
             <th>Conta</th>
-            <th>Valor total</th>
             <th>Dia venc.</th>
             <th>Nº parcela</th>
             <th>Valor parcela</th>
@@ -31,10 +30,9 @@
         <tbody>
           <tr v-for="parcela in accounts" :key="parcela.id">
             <td>
-              {{ parcela.ds_nome }}
+              {{ parcela.account.ds_nome }}
             </td>
-            <td> {{ formattedValue(parcela.valor_total) }}</td>
-            <td> {{ parcela.dia_vencimento }} </td>
+            <td> {{ parcela.account.dia_vencimento }} </td>
             <td>{{ parcela.numero_parcela }}</td>
 
             <td>
@@ -123,41 +121,23 @@ export default {
           const endOfMonth = new Date(selectedYear, selectedMonth.value + 1, 0).toISOString();
 
           const { data: accountsResult, error: accountsError } = await supabase
-            .from("account")
-            .select("*, account_parcelas(*)")
-            .eq("user_id", user.id)
-            .gte("account_parcelas.dt_vencimento", startOfMonth)
-            .lte("account_parcelas.dt_vencimento", endOfMonth)
-            .order("created_at", { ascending: false });
+            .from('account_parcelas')
+            .select('*, account:id_account(*)')
+            .eq('account.user_id', user.id)
+            .gte('dt_vencimento', startOfMonth)
+            .lte('dt_vencimento', endOfMonth)
+            .order('dt_vencimento', { ascending: true });
 
           if (accountsError) {
             toast.error("Ocorreu um erro ao buscar as contas");
           }
 
           const result = accountsResult.map((conta) => {
-            if (conta.account_parcelas && conta.account_parcelas.length > 0) {
-              return conta.account_parcelas.map((parcela) => ({
-                ...parcela,
-                id_account: conta.id,
-                ds_nome: conta.ds_nome,
-                valor_total: conta.valor_total,
-                dia_vencimento: conta.dia_vencimento,
-                status: parcela.dt_pagamento ? "Pago" : validateStatus(parcela.dt_vencimento)
-              }));
-            } else {
-              return [{
-                id: conta.id,
-                ds_nome: conta.ds_nome,
-                valor_total: conta.valor_total,
-                dia_vencimento: conta.dia_vencimento,
-                numero_parcela: null,
-                valor_parcela: null,
-                dt_vencimento: null,
-                dt_pagamento: null,
-                status: "Sem parcelas",
-              }];
-            }
-          }).flat();
+              return {
+                ...conta,
+                status: conta.dt_pagamento ? "Pago" : validateStatus(conta.dt_vencimento)
+              };
+          });
 
           accounts.value = result;
         }
@@ -188,6 +168,10 @@ export default {
         style: "currency",
         currency: "BRL",
       }).format(value);
+    }
+
+    function formattedDate(date) {
+      return new Intl.DateTimeFormat("pt-BR").format(new Date(date));
     }
 
     function edit(parcela, field) {
@@ -235,7 +219,8 @@ export default {
       fetchAccounts,
       deletarParcela,
       edit,
-      saveEdit
+      saveEdit,
+      formattedDate
     };
   },
 };
