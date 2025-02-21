@@ -1,7 +1,5 @@
 <template>
   <div class="container">
-    <h2 class="text-center mb-4">Minhas Contas</h2>
-
     <div class="d-flex justify-content-center mb-3">
       <select v-model="selectedMonth" @change="fetchAccounts" class="form-select" aria-label="Selecione o mês">
         <option value="" disabled>Selecione o mês</option>
