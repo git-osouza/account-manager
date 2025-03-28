@@ -45,7 +45,7 @@ jobs:
         cp -r ../dist/.* ./ 2>/dev/null || :
         rm -rf dist
         git add .
-        git commit -m "Atualizar arquivos de construção [skip ci]" || echo "Nada para commitar"
+        git commit -m "Atualizar arquivos de construção [skip ci]" || echo "Nada para commitar por momento..."
         git push origin main  # Empurrando para a branch main
       env:
         TOKEN_TESTE_DEPLOY: ${{ secrets.TOKEN_TESTE_DEPLOY }}
