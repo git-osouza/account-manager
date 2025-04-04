@@ -41,6 +41,7 @@ export default {
           .from("account_parcelas")
           .select("dt_vencimento, valor_parcela")
           .lt("dt_vencimento", today)
+          .is("dt_pagamento", null)
           .order("dt_vencimento", { ascending: false });
 
         if (accountsError) {
