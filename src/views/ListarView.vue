@@ -1,5 +1,37 @@
 <template>
   <div class="container">
+    <div class="d-flex flex-column align-items-center mb-4 gap-2">
+      <div class="input-group w-auto">
+        <span class="input-group-text">💰 Salário</span>
+        <input
+          v-model="monthlySalary"
+          type="number"
+          class="form-control"
+          placeholder="Informe o salário do mês"
+        />
+      </div>
+
+      <div class="input-group w-auto">
+        <span class="input-group-text">📄 Total de Contas</span>
+        <input
+          :value="totalAccounts"
+          type="number"
+          class="form-control"
+          readonly
+        />
+      </div>
+
+      <div class="input-group w-auto">
+        <span class="input-group-text">💼 Valor Restante</span>
+        <input
+          :value="remainingBalance"
+          type="number"
+          class="form-control"
+          readonly
+        />
+      </div>
+    </div>
+
     <div class="d-flex justify-content-center mb-3">
       <select v-model="selectedMonth" @change="fetchAccounts" class="form-select" aria-label="Selecione o mês">
         <option value="" disabled>Selecione o mês</option>
@@ -96,6 +128,9 @@ export default {
     const loading = ref(true);
     const error = ref(null);
     const accounts = ref([]);
+    const monthlySalary = ref(8800)
+    const totalAccounts = ref(0)
+
 
     const months = computed(() => {
       return [
@@ -105,6 +140,13 @@ export default {
     });
 
     const selectedMonth = ref(null);
+
+    const remainingBalance = computed(() => {
+      const result = monthlySalary.value - totalAccounts.value;
+      return result < 0 ? 0 : result.toFixed(2);
+    });
+
+
 
     async function fetchAccounts() {
       if (selectedMonth.value === null) return;
@@ -137,6 +179,7 @@ export default {
               };
           });
 
+          totalAccounts.value = Number(accountsResult.reduce((acc, item) => acc + item.valor_parcela, 0)).toFixed(2);
           accounts.value = result;
         }
       } catch (err) {
@@ -218,7 +261,10 @@ export default {
       deletarParcela,
       edit,
       saveEdit,
-      formattedDate
+      formattedDate,
+      monthlySalary,
+      totalAccounts,
+      remainingBalance,
     };
   },
 };
