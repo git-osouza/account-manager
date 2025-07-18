@@ -128,7 +128,7 @@ export default {
     const loading = ref(true);
     const error = ref(null);
     const accounts = ref([]);
-    const monthlySalary = ref(8800)
+    const monthlySalary = ref(9970)
     const totalAccounts = ref(0)
 
 
@@ -234,6 +234,7 @@ export default {
           toast.error("Ocorreu um erro ao salvar a alteração");
         } else {
           toast.success("Alteração salva com sucesso!");
+          recalcTotalAccounts();
         }
       }
 
@@ -247,6 +248,12 @@ export default {
         return 'Atrasado';
       }
       return 'Pendente';
+    }
+
+    function recalcTotalAccounts() {
+      totalAccounts.value = accounts.value
+        .reduce((acc, item) => acc + Number(item.valor_parcela || 0), 0)
+        .toFixed(2);
     }
 
 
@@ -265,6 +272,7 @@ export default {
       monthlySalary,
       totalAccounts,
       remainingBalance,
+      recalcTotalAccounts
     };
   },
 };

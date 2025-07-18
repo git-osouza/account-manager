@@ -46,7 +46,11 @@ export const signInWithPassword = async (email, password) => {
 export const signInWithOAuth = async (provider) => {
   try {
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: provider
+      provider: provider,
+      options: {
+        redirectTo: 'https://git-osouza.github.io/account-manager/'
+      }
+
     });
 
     if (error) {
