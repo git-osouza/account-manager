@@ -33,7 +33,12 @@
     </div>
 
     <div class="d-flex justify-content-center mb-3">
-      <select v-model="selectedMonth" @change="fetchAccounts" class="form-select" aria-label="Selecione o mês">
+      <select 
+        v-model="selectedMonth" 
+        @change="() => { fetchAccounts(); setMonthlySalaryToMonth(selectedMonth) }" 
+        class="form-select" 
+        aria-label="Selecione o mês"
+      >
         <option value="" disabled>Selecione o mês</option>
         <option v-for="(month, index) in months" :key="index" :value="index">
           {{ month }}
@@ -115,7 +120,7 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useToast } from "vue-toastification";
 import supabase from "@/utils/supabase";
 
@@ -146,7 +151,18 @@ export default {
       return result < 0 ? 0 : result.toFixed(2);
     });
 
+    watch(selectedMonth, (newMonth) => {
+      if (newMonth !== null) {
+        const savedSalary = localStorage.getItem(`monthlySalary-${newMonth}`);
+        monthlySalary.value = savedSalary ? JSON.parse(savedSalary) : 0;
+      }
+    });
 
+    watch(monthlySalary, (newSalary) => {
+      if (selectedMonth.value !== null) {
+        localStorage.setItem(`monthlySalary-${selectedMonth.value}`, JSON.stringify(newSalary));
+        }
+    });
 
     async function fetchAccounts() {
       if (selectedMonth.value === null) return;
@@ -256,6 +272,11 @@ export default {
         .toFixed(2);
     }
 
+    function setMonthlySalaryToMonth(index) {
+      const savedSalary = localStorage.getItem(`monthlySalary-${index}`);
+      monthlySalary.value = savedSalary ? JSON.parse(savedSalary) : 0;
+    }
+
 
     return {
       accounts,
@@ -272,7 +293,8 @@ export default {
       monthlySalary,
       totalAccounts,
       remainingBalance,
-      recalcTotalAccounts
+      recalcTotalAccounts,
+      setMonthlySalaryToMonth
     };
   },
 };
