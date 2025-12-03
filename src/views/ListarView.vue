@@ -32,18 +32,39 @@
       </div>
     </div>
 
-    <div class="d-flex justify-content-center mb-3">
+    <div class="d-flex justify-content-center gap-2 mb-3">
+
+      <!-- SELECT DO ANO -->
       <select 
-        v-model="selectedMonth" 
-        @change="() => { fetchAccounts(); setMonthlySalaryToMonth(selectedMonth) }" 
-        class="form-select" 
+        v-model="selectedYear"
+        class="form-select"
+        aria-label="Selecione o ano"
+        @change="fetchAccounts"
+      >
+        <option value="" disabled>Selecione o ano</option>
+        <option v-for="year in years" :key="year" :value="year">
+          {{ year }}
+        </option>
+      </select>
+
+      <!-- SELECT DO MÊS -->
+      <select 
+        v-model="selectedMonth"
+        class="form-select"
         aria-label="Selecione o mês"
+        :disabled="!selectedYear"
+        @change="() => { fetchAccounts(); setMonthlySalaryToMonth(selectedMonth) }"
       >
         <option value="" disabled>Selecione o mês</option>
-        <option v-for="(month, index) in months" :key="index" :value="index">
+        <option 
+          v-for="(month, index) in months" 
+          :key="index" 
+          :value="index"
+        >
           {{ month }}
         </option>
       </select>
+
     </div>
 
     <div v-if="error" class="alert alert-danger text-center">{{ error }}</div>
@@ -120,9 +141,9 @@
 </template>
 
 <script>
-import { ref, computed, watch } from "vue";
-import { useToast } from "vue-toastification";
 import supabase from "@/utils/supabase";
+import { computed, ref, watch } from "vue";
+import { useToast } from "vue-toastification";
 
 export default {
   name: "ListarView",
@@ -135,7 +156,12 @@ export default {
     const accounts = ref([]);
     const monthlySalary = ref(9970)
     const totalAccounts = ref(0)
+    const selectedYear = ref(new Date().getFullYear());
 
+    const years = computed(() => {
+      const currentYear = new Date().getFullYear();
+      return Array.from({ length: 5 }, (_, i) => currentYear + i); 
+    });
 
     const months = computed(() => {
       return [
@@ -165,16 +191,17 @@ export default {
     });
 
     async function fetchAccounts() {
-      if (selectedMonth.value === null) return;
+      if (selectedMonth.value === null || !selectedYear.value) return;
+
+      loading.value = true;
 
       try {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
         if (authError) throw authError;
 
         if (user) {
-          const selectedYear = new Date().getFullYear();
-          const startOfMonth = new Date(selectedYear, selectedMonth.value, 1).toISOString();
-          const endOfMonth = new Date(selectedYear, selectedMonth.value + 1, 0).toISOString();
+          const startOfMonth = new Date(selectedYear.value, selectedMonth.value, 1).toISOString();
+          const endOfMonth = new Date(selectedYear.value, selectedMonth.value + 1, 0).toISOString();
 
           const { data: accountsResult, error: accountsError } = await supabase
             .from('account_parcelas')
@@ -188,14 +215,15 @@ export default {
             toast.error("Ocorreu um erro ao buscar as contas");
           }
 
-          const result = accountsResult.map((conta) => {
-              return {
-                ...conta,
-                status: conta.dt_pagamento ? "Pago" : validateStatus(conta.dt_vencimento)
-              };
-          });
+          const result = accountsResult.map((conta) => ({
+            ...conta,
+            status: conta.dt_pagamento ? "Pago" : validateStatus(conta.dt_vencimento)
+          }));
 
-          totalAccounts.value = Number(accountsResult.reduce((acc, item) => acc + item.valor_parcela, 0)).toFixed(2);
+          totalAccounts.value = Number(
+            accountsResult.reduce((acc, item) => acc + item.valor_parcela, 0)
+          ).toFixed(2);
+
           accounts.value = result;
         }
       } catch (err) {
@@ -294,7 +322,9 @@ export default {
       totalAccounts,
       remainingBalance,
       recalcTotalAccounts,
-      setMonthlySalaryToMonth
+      setMonthlySalaryToMonth,
+      years,
+      selectedYear,
     };
   },
 };
