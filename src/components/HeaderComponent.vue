@@ -11,7 +11,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <RouterLink class="nav-link" to="/Dashboard">
+                    <a href="#" class="nav-link" @click.prevent="$emit('change-view','Dashboard')">
                         Dashboard
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-speedometer" viewBox="0 0 16 16">
@@ -20,22 +20,22 @@
                             <path fill-rule="evenodd"
                                 d="M6.664 15.889A8 8 0 1 1 9.336.11a8 8 0 0 1-2.672 15.78zm-4.665-4.283A11.95 11.95 0 0 1 8 10c2.186 0 4.236.585 6.001 1.606a7 7 0 1 0-12.002 0" />
                         </svg>
-                    </RouterLink>
-                    <RouterLink class="nav-link" to="/Listar">
+                    </a>
+                    <a href="#" class="nav-link" @click.prevent="$emit('change-view','Listar')">
                         Listar
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-heading" viewBox="0 0 16 16">
                             <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
                             <path d="M3 8.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5m0-5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5z"/>
                         </svg>
-                    </RouterLink>
-                    <RouterLink class="nav-link" to="/Cadastrar">
+                    </a>
+                    <a href="#" class="nav-link" @click.prevent="$emit('change-view','Cadastrar')">
                         Cadastrar
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
                             <path
                                 d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z" />
                         </svg>
-                    </RouterLink>
+                    </a>
                     <a href="#" class="nav-link" @click="logoff">
                         Sair
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -55,6 +55,7 @@ import { logoff } from '@/services/auth/loginService';
 
 export default {
     name: 'HeaderComponent',
+    emits: ['change-view'],
     data() {
         return {
         };
@@ -62,6 +63,7 @@ export default {
     methods: {
         async logoff() {
             await logoff();
+            this.$emit('change-view', 'Login');
         }
     }
 };

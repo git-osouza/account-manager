@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <HeaderComponent v-if="!isLoginPage" />
+    <HeaderComponent v-if="!isLoginPage" @change-view="setView" />
     <div class="content">
-      <router-view />
+      <component :is="currentComponent" @login-success="onLoginSuccess" @change-view="setView" />
     </div>
     <FooterComponent v-if="!isLoginPage" />
   </div>
@@ -11,8 +11,12 @@
 <script>
 import FooterComponent from './components/FooterComponent.vue';
 import HeaderComponent from './components/HeaderComponent.vue';
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, ref, onMounted } from 'vue';
+import supabase from '@/utils/supabase';
+import LoginView from '@/views/LoginView.vue';
+import DashboardView from '@/views/DashboardView.vue';
+import ListarView from '@/views/ListarView.vue';
+import CadastrarView from '@/views/CadastrarView.vue';
 
 
 export default {
@@ -22,12 +26,58 @@ export default {
     FooterComponent
   },
   setup() {
-    const route = useRoute();
+    const currentView = ref('Login');
 
-    const isLoginPage = computed(() => route.name === 'Login');
+    const views = {
+      Login: LoginView,
+      Dashboard: DashboardView,
+      Listar: ListarView,
+      Cadastrar: CadastrarView,
+    };
+
+    const currentComponent = computed(() => views[currentView.value] || LoginView);
+    const isLoginPage = computed(() => currentView.value === 'Login');
+
+    const setView = (viewName) => {
+      if (views[viewName]) {
+        currentView.value = viewName;
+      }
+    };
+
+    const onLoginSuccess = () => {
+      currentView.value = 'Dashboard';
+    };
+
+    onMounted(async () => {
+      try {
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSessionFromUrl();
+        if (sessionError) {
+          currentView.value = 'Login';
+        } else if (sessionData && sessionData.session) {
+          currentView.value = 'Dashboard';
+        } else {
+          const { data: { user } } = await supabase.auth.getUser();
+          currentView.value = user ? 'Dashboard' : 'Login';
+        }
+      } catch {
+        currentView.value = 'Login';
+      }
+
+      supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_OUT') {
+          currentView.value = 'Login';
+        }
+        if (event === 'SIGNED_IN' && session) {
+          currentView.value = 'Dashboard';
+        }
+      });
+    });
 
     return {
       isLoginPage,
+      currentComponent,
+      setView,
+      onLoginSuccess,
     };
   }
 }

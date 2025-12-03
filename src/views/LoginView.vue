@@ -52,7 +52,8 @@ import { signInWithOAuth } from '@/services/auth/loginService';
 
 export default {
   name: 'LoginView',
-  setup() {
+  emits: ['login-success'],
+  setup(props, { emit }) {
     const user = reactive({
       email: '',
       password: ''
@@ -62,7 +63,8 @@ export default {
       if (user.email === '' || user.password === '') {
         return;
       }
-      await signInWithPassword(user.email, user.password);
+      const ok = await signInWithPassword(user.email, user.password);
+      if (ok) emit('login-success');
     };
 
     const signInOAuth = async (provider) => {
