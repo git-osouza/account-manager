@@ -174,7 +174,7 @@ export default {
 
     const remainingBalance = computed(() => {
       const result = monthlySalary.value - totalAccounts.value;
-      return result < 0 ? 0 : result.toFixed(2);
+      return result.toFixed(2);
     });
 
     watch(selectedMonth, (newMonth) => {
