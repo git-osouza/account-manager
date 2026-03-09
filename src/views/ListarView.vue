@@ -276,6 +276,8 @@ export default {
           const today = new Date().toISOString().split('T')[0];
           parcela.dt_pagamento = today;
           updateData.dt_pagamento = today;
+          // Subtrai o valor da parcela do salário mensal
+          monthlySalary.value = Number((monthlySalary.value - parcela.valor_parcela).toFixed(2));
         }
 
         const { error } = await supabase
