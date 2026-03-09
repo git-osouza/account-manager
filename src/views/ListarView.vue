@@ -154,7 +154,7 @@ export default {
     const loading = ref(true);
     const error = ref(null);
     const accounts = ref([]);
-    const monthlySalary = ref(9970)
+    const monthlySalary = ref(0)
     const totalAccounts = ref(0)
     const selectedYear = ref(new Date().getFullYear());
 
@@ -221,7 +221,8 @@ export default {
           }));
 
           totalAccounts.value = Number(
-            accountsResult.reduce((acc, item) => acc + item.valor_parcela, 0)
+            result.filter((item) => item.status !== 'Pago')
+              .reduce((acc, item) => acc + Number(item.valor_parcela || 0), 0)
           ).toFixed(2);
 
           accounts.value = result;
@@ -269,9 +270,17 @@ export default {
       const newValue = parcela[field];
 
       if (originalValue !== newValue) {
+        const updateData = { [field]: newValue };
+
+        if (field === 'status' && newValue === 'Pago' && originalValue !== 'Pago') {
+          const today = new Date().toISOString().split('T')[0];
+          parcela.dt_pagamento = today;
+          updateData.dt_pagamento = today;
+        }
+
         const { error } = await supabase
           .from('account_parcelas')
-          .update({ [field]: newValue })
+          .update(updateData)
           .eq('id', parcela.id);
 
         if (error) {
@@ -296,6 +305,7 @@ export default {
 
     function recalcTotalAccounts() {
       totalAccounts.value = accounts.value
+        .filter((item) => item.status !== 'Pago')
         .reduce((acc, item) => acc + Number(item.valor_parcela || 0), 0)
         .toFixed(2);
     }
