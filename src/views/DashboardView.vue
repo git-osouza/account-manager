@@ -111,6 +111,13 @@ Você não possui nenhuma parcela em atraso no momento. Continue assim!
         </div>
       </div>
     </div>
+
+    <!-- Gráfico de Orçamento 70/20/10 -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <BudgetPieChart />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -118,9 +125,11 @@ Você não possui nenhuma parcela em atraso no momento. Continue assim!
 import { ref, onMounted, onActivated, computed } from "vue";
 import { useToast } from "vue-toastification";
 import supabase from "@/utils/supabase";
+import BudgetPieChart from "@/components/BudgetPieChart.vue";
 
 export default {
   name: 'DashboardView',
+  components: { BudgetPieChart },
   emits: ['change-view'],
   setup(props, { emit }) {
     const toast = useToast();
