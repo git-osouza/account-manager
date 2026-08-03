@@ -5,7 +5,7 @@
       <div class="col-md-4">
         <div class="glass-card budget-widget d-flex align-items-center justify-content-between p-3 h-100">
           <div>
-            <span class="text-muted small uppercase">Salário Mensal</span>
+            <span class="text-light opacity-75 small uppercase fw-semibold">Salário Mensal</span>
             <div class="d-flex align-items-center gap-1 mt-1">
               <span class="currency-symbol text-secondary font-monospace">R$</span>
               <input
@@ -25,7 +25,7 @@
       <div class="col-md-4">
         <div class="glass-card budget-widget d-flex align-items-center justify-content-between p-3 h-100">
           <div>
-            <span class="text-muted small uppercase">Total de Contas</span>
+            <span class="text-light opacity-75 small uppercase fw-semibold">Total de Contas</span>
             <h3 class="fw-bold mt-1 mb-0 text-white font-monospace">
 {{ formattedValue(totalAccounts) }}
 </h3>
@@ -39,10 +39,17 @@
       <div class="col-md-4">
         <div class="glass-card budget-widget d-flex align-items-center justify-content-between p-3 h-100">
           <div>
-            <span class="text-muted small uppercase">Saldo Restante</span>
+            <span class="text-light opacity-75 small uppercase fw-semibold">Saldo Restante</span>
             <h3 :class="['fw-bold mt-1 mb-0 font-monospace', remainingBalance < 0 ? 'text-danger-custom' : 'text-success-custom']">
               {{ formattedValue(remainingBalance) }}
             </h3>
+            <div
+v-if="previousMonthBalance > 0"
+class="text-success-custom mt-1 small fw-semibold"
+style="font-size: 0.75rem;"
+>
+              + {{ formattedValue(previousMonthBalance) }} do mês anterior
+            </div>
           </div>
           <div class="widget-icon bg-emerald-glow">
             💼
@@ -482,9 +489,10 @@ export default {
     const error = ref(null);
     const accounts = ref([]);
     const monthlySalary = ref(0);
+    const previousMonthBalance = ref(0);
     const totalAccounts = ref(0);
     const selectedYear = ref(new Date().getFullYear());
-    const selectedMonth = ref(null);
+    const selectedMonth = ref(new Date().getMonth());
     const parcelasEditValues = reactive({});
 
     const years = computed(() => {
@@ -500,7 +508,7 @@ export default {
     });
 
     const remainingBalance = computed(() => {
-      return Number((monthlySalary.value - totalAccounts.value).toFixed(2));
+      return Number((monthlySalary.value + previousMonthBalance.value - totalAccounts.value).toFixed(2));
     });
 
     watch(selectedMonth, (newMonth) => {
@@ -548,6 +556,7 @@ export default {
 
           recalcTotalAccounts(result);
           accounts.value = result;
+          await fetchPreviousMonthBalance();
         }
       } catch (err) {
         console.error("Erro ao buscar contas:", err.message);
@@ -555,6 +564,51 @@ export default {
         toast.error(error.value);
       } finally {
         loading.value = false;
+      }
+    }
+
+    async function fetchPreviousMonthBalance() {
+      if (selectedMonth.value === null || !selectedYear.value) return;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        let prevMonth = selectedMonth.value - 1;
+        let prevYear = selectedYear.value;
+        if (prevMonth < 0) {
+          prevMonth = 11;
+          prevYear -= 1;
+        }
+
+        const savedSalary = localStorage.getItem(`monthlySalary-${prevMonth}`);
+        const prevSalary = savedSalary ? JSON.parse(savedSalary) : 0;
+        
+        if (prevSalary <= 0) {
+          previousMonthBalance.value = 0;
+          return;
+        }
+
+        const startOfMonth = new Date(prevYear, prevMonth, 1).toISOString();
+        const endOfMonth = new Date(prevYear, prevMonth + 1, 0).toISOString();
+
+        const { data: accountsResult, error: accountsError } = await supabase
+          .from('account_parcelas')
+          .select('*, account:id_account(*)')
+          .eq('account.user_id', user.id)
+          .gte('dt_vencimento', startOfMonth)
+          .lte('dt_vencimento', endOfMonth);
+
+        if (accountsError) throw accountsError;
+
+        const prevTotalAccounts = accountsResult
+          .filter((item) => (item.dt_pagamento ? "Pago" : validateStatus(item.dt_vencimento)) !== 'Pago')
+          .reduce((acc, item) => acc + Number(item.valor_parcela || 0), 0);
+
+        const balance = prevSalary - prevTotalAccounts;
+        previousMonthBalance.value = balance > 0 ? balance : 0;
+      } catch (err) {
+        console.error("Erro ao buscar saldo anterior:", err);
+        previousMonthBalance.value = 0;
       }
     }
 
@@ -644,7 +698,12 @@ export default {
     }
 
     onMounted(() => {
-      applyFilterParams();
+      if (props.filterParams) {
+        applyFilterParams();
+      } else {
+        setMonthlySalaryToMonth(selectedMonth.value);
+        fetchAccounts();
+      }
     });
 
     watch(() => props.filterParams, (newVal) => {
@@ -688,7 +747,7 @@ export default {
     return {
       accounts, months, selectedMonth, loading, error, formattedValue,
       fetchAccounts, deletarParcela, edit, saveEdit, monthlySalary,
-      totalAccounts, remainingBalance, recalcTotalAccounts,
+      previousMonthBalance, totalAccounts, remainingBalance, recalcTotalAccounts,
       setMonthlySalaryToMonth, years, selectedYear, parcelasEditValues,
       getStatusClass, markAsPaidQuick
     };

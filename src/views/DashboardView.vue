@@ -13,13 +13,13 @@
           </div>
           <div class="d-flex align-items-center gap-3">
             <div class="stat-bubble d-flex flex-column align-items-end">
-              <span class="text-muted small uppercase">Total em Atraso</span>
+              <span class="text-light opacity-75 small uppercase fw-semibold">Total em Atraso</span>
               <h3 class="fw-bold text-danger-custom mb-0">
                 {{ formattedValue(totalOverdueAmount) }}
               </h3>
             </div>
             <div class="stat-bubble d-flex flex-column align-items-end border-left-bubble ps-3">
-              <span class="text-muted small uppercase">Contas Pendentes</span>
+              <span class="text-light opacity-75 small uppercase fw-semibold">Contas Pendentes</span>
               <h3 class="fw-bold text-white mb-0">
                 {{ totalOverdueCount }}
               </h3>
