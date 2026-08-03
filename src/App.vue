@@ -29,6 +29,7 @@ import LoginView from '@/views/LoginView.vue';
 import DashboardView from '@/views/DashboardView.vue';
 import ListarView from '@/views/ListarView.vue';
 import CadastrarView from '@/views/CadastrarView.vue';
+import AssistenteIAView from '@/views/AssistenteIAView.vue';
 
 
 export default {
@@ -46,6 +47,7 @@ export default {
       Dashboard: DashboardView,
       Listar: ListarView,
       Cadastrar: CadastrarView,
+      AssistenteIA: AssistenteIAView,
     };
 
     const currentComponent = computed(() => views[currentView.value] || LoginView);

@@ -41,6 +41,15 @@ class="nav-btn-premium"
             <span class="btn-label d-inline d-md-none">Cadastrar</span>
           </button>
           
+          <button
+            :class="['nav-btn-premium', { active: currentView === 'AssistenteIA' }]"
+            @click.prevent="$emit('change-view','AssistenteIA')"
+          >
+            <span class="btn-icon">🤖</span>
+            <span class="btn-label d-none d-md-inline">Assistente IA</span>
+            <span class="btn-label d-inline d-md-none">IA</span>
+          </button>
+          
           <span class="vertical-divider mx-1" />
           
           <button
