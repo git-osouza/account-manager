@@ -1,0 +1,243 @@
+/* --- Design System: Premium Dark Theme --- */
+:root {
+  --bg-primary: #0b0f19;
+  --bg-secondary: #111827;
+  --bg-card: rgba(17, 24, 39, 0.7);
+  --border-card: rgba(255, 255, 255, 0.08);
+  --border-card-hover: rgba(255, 255, 255, 0.16);
+  
+  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --primary-color: #6366f1;
+  --primary-hover: #4f46e5;
+  
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  
+  --color-success: #10b981;
+  --color-success-bg: rgba(16, 185, 129, 0.15);
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.15);
+  --color-danger: #f43f5e;
+  --color-danger-bg: rgba(244, 63, 94, 0.15);
+}
+
+/* --- Global Reset & Scrollbars --- */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Layout Contêiner --- */
+.container {
+  max-width: 1200px !important;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.content {
+  padding-top: 2rem;
+  padding-bottom: 3rem;
+}
+
+/* --- Glassmorphism Card --- */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-card);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glass-card:hover {
+  border-color: var(--border-card-hover);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+/* --- Form Controls Customizados --- */
+.form-floating {
+  margin-bottom: 1.25rem;
+}
+.form-control, .form-select {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-primary) !important;
+  border-radius: 12px !important;
+  height: 58px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+.form-control:focus, .form-select:focus {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25) !important;
+  outline: none !important;
+}
+.form-floating > label {
+  color: var(--text-secondary) !important;
+}
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label,
+.form-floating > .form-select ~ label {
+  color: var(--primary-color) !important;
+  transform: scale(0.85) translateY(-0.75rem) translateX(0.15rem) !important;
+}
+
+/* --- Inputs Específicos para Select --- */
+.form-select option {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* --- Botões Modernos --- */
+.btn-primary-gradient {
+  background: var(--primary-gradient);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.4);
+}
+.btn-primary-gradient:hover {
+  opacity: 0.95;
+  box-shadow: 0 6px 20px 0 rgba(99, 102, 241, 0.6);
+  transform: translateY(-1px);
+}
+.btn-primary-gradient:active {
+  transform: translateY(0);
+}
+
+.btn-glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* --- Badges de Status --- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.status-badge.pago {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+.status-badge.pendente {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+.status-badge.atrasado {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+/* --- Tabela Moderna --- */
+.table-responsive {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border-card);
+}
+.table {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  margin-bottom: 0 !important;
+}
+.table th {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  color: var(--text-secondary) !important;
+  border-bottom: 2px solid var(--border-card) !important;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.25rem !important;
+}
+.table td {
+  padding: 1.1rem 1.25rem !important;
+  border-bottom: 1px solid var(--border-card) !important;
+  vertical-align: middle !important;
+  color: var(--text-primary) !important;
+  background-color: transparent !important;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+.table-hover tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* --- Estilos para Edição Inline (ListarView) --- */
+.editable-cell {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.editable-cell:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+.editable-cell::after {
+  content: "✎";
+  font-size: 0.8rem;
+  opacity: 0;
+  color: var(--text-secondary);
+  transition: opacity 0.2s ease;
+}
+.editable-cell:hover::after {
+  opacity: 1;
+}
+
+/* --- Utilitários de Gradientes e Efeitos --- */
+.text-gradient {
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}

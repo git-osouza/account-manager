@@ -1,31 +1,22 @@
 <template>
-
-    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
-        <div class="col-md-4 d-flex align-items-center">
-            <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
-                <svg class="bi" width="30" height="24">
-                    <use xlink:href="#bootstrap"></use>
-                </svg>
-            </a>
-            <span class="mb-3 mb-md-0 text-body-secondary">© 2024 Genrenciador de contas, Inc</span>
-        </div>
-    </footer>
+  <footer class="d-flex flex-wrap justify-content-between align-items-center py-4 my-5 border-top-premium">
+    <div class="col-md-4 d-flex align-items-center">
+      <span class="text-muted-custom small">© 2026 Gerenciador de Contas, Inc. Todos os direitos reservados.</span>
+    </div>
+  </footer>
 </template>
 
 <script>
-
-
 export default {
-    name: 'FooterComponent',
-    data() {
-        return {
-        };
-    },
-    methods: {
-    }
+  name: 'FooterComponent'
 };
-
-
-
 </script>
-<style></style>
+
+<style scoped>
+.border-top-premium {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.text-muted-custom {
+  color: var(--text-muted);
+}
+</style>

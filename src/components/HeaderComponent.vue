@@ -1,76 +1,269 @@
 <template>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <img src="../assets/prancheta.png" alt="account-manager" width="35" height="36">
-                Gerenciador de contas
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                <div class="navbar-nav">
-                    <a href="#" class="nav-link" @click.prevent="$emit('change-view','Dashboard')">
-                        Dashboard
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            class="bi bi-speedometer" viewBox="0 0 16 16">
-                            <path
-                                d="M8 2a.5.5 0 0 1 .5.5V4a.5.5 0 0 1-1 0V2.5A.5.5 0 0 1 8 2M3.732 3.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707M2 8a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 8m9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5m.754-4.246a.39.39 0 0 0-.527-.02L7.547 7.31A.91.91 0 1 0 8.85 8.569l3.434-4.297a.39.39 0 0 0-.029-.518z" />
-                            <path fill-rule="evenodd"
-                                d="M6.664 15.889A8 8 0 1 1 9.336.11a8 8 0 0 1-2.672 15.78zm-4.665-4.283A11.95 11.95 0 0 1 8 10c2.186 0 4.236.585 6.001 1.606a7 7 0 1 0-12.002 0" />
-                        </svg>
-                    </a>
-                    <a href="#" class="nav-link" @click.prevent="$emit('change-view','Listar')">
-                        Listar
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-heading" viewBox="0 0 16 16">
-                            <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
-                            <path d="M3 8.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5m0-5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5z"/>
-                        </svg>
-                    </a>
-                    <a href="#" class="nav-link" @click.prevent="$emit('change-view','Cadastrar')">
-                        Cadastrar
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
-                            <path
-                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z" />
-                        </svg>
-                    </a>
-                    <a href="#" class="nav-link" @click="logoff">
-                        Sair
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            class="bi bi-x-circle-fill" viewBox="0 0 16 16">
-                            <path
-                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
-                        </svg>
-                    </a>
-                </div>
-            </div>
+  <nav class="premium-navbar py-2 px-3 mb-4">
+    <div class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-2">
+      <!-- Caso esteja no Dashboard: Mostrar Logo e Menu Principal -->
+      <template v-if="currentView === 'Dashboard'">
+        <div class="d-flex align-items-center gap-2">
+          <img
+src="../assets/prancheta.png"
+alt="logo"
+width="30"
+height="31"
+class="brand-logo"
+>
+          <span class="brand-text text-gradient d-none d-sm-inline">Gerenciador de Contas</span>
         </div>
-    </nav>
+        
+        <div class="d-flex align-items-center gap-2">
+          <button
+class="nav-btn-premium active"
+@click.prevent="$emit('change-view','Dashboard')"
+>
+            <span class="btn-icon">📊</span>
+            <span class="btn-label d-none d-md-inline">Dashboard</span>
+          </button>
+          
+          <button
+class="nav-btn-premium"
+@click.prevent="$emit('change-view','Listar')"
+>
+            <span class="btn-icon">📋</span>
+            <span class="btn-label d-none d-md-inline">Listar Contas</span>
+            <span class="btn-label d-inline d-md-none">Listar</span>
+          </button>
+          
+          <button
+class="nav-btn-premium"
+@click.prevent="$emit('change-view','Cadastrar')"
+>
+            <span class="btn-icon">➕</span>
+            <span class="btn-label d-none d-md-inline">Nova Conta</span>
+            <span class="btn-label d-inline d-md-none">Cadastrar</span>
+          </button>
+          
+          <span class="vertical-divider mx-1" />
+          
+          <button
+class="nav-btn-premium logout-btn"
+@click.prevent="logoff"
+>
+            <span class="btn-icon">🚪</span>
+            <span class="btn-label d-none d-sm-inline">Sair</span>
+          </button>
+        </div>
+      </template>
+
+      <!-- Caso esteja em outra tela (Listar/Cadastrar): Mostrar Botão "Voltar ao Dashboard" -->
+      <template v-else>
+        <div class="d-flex align-items-center gap-3">
+          <button
+class="btn-back-card d-flex align-items-center gap-2"
+@click.prevent="$emit('change-view','Dashboard')"
+>
+            <svg
+xmlns="http://www.w3.org/2000/svg"
+width="16"
+height="16"
+fill="currentColor"
+class="bi bi-arrow-left-short"
+viewBox="0 0 16 16"
+>
+              <path
+fill-rule="evenodd"
+d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"
+/>
+            </svg>
+            <span>Voltar ao Dashboard</span>
+          </button>
+          <span class="page-title-badge text-capitalize d-none d-sm-inline-block">{{ currentView }}</span>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <!-- Atalho rápido entre Cadastrar e Listar quando fora do Dashboard -->
+          <button 
+            v-if="currentView === 'Listar'" 
+            class="nav-btn-premium-compact" 
+            @click.prevent="$emit('change-view','Cadastrar')"
+          >
+            <span>➕ Nova Conta</span>
+          </button>
+          <button 
+            v-if="currentView === 'Cadastrar'" 
+            class="nav-btn-premium-compact" 
+            @click.prevent="$emit('change-view','Listar')"
+          >
+            <span>📋 Listar Contas</span>
+          </button>
+
+          <span class="vertical-divider mx-1" />
+          
+          <button
+class="nav-btn-premium logout-btn-compact"
+title="Sair"
+@click.prevent="logoff"
+>
+            <span>🚪</span>
+          </button>
+        </div>
+      </template>
+    </div>
+  </nav>
 </template>
 
 <script>
 import { logoff } from '@/services/auth/loginService';
 
 export default {
-    name: 'HeaderComponent',
-    emits: ['change-view'],
-    data() {
-        return {
-        };
-    },
-    methods: {
-        async logoff() {
-            await logoff();
-            this.$emit('change-view', 'Login');
-        }
+  name: 'HeaderComponent',
+  props: {
+    currentView: {
+      type: String,
+      default: 'Dashboard'
     }
+  },
+  emits: ['change-view'],
+  methods: {
+    async logoff() {
+      await logoff();
+      this.$emit('change-view', 'Login');
+    }
+  }
 };
-
-
-
 </script>
 
+<style scoped>
+.premium-navbar {
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  width: 100%;
+}
 
-<style scoped></style>
+.brand-logo {
+  filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
+}
+
+.brand-text {
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+
+/* Botões Menu Principal */
+.nav-btn-premium {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  border-radius: 12px;
+  padding: 0.5rem 0.85rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.nav-btn-premium:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+.nav-btn-premium.active {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.25);
+  color: #a5b4fc;
+}
+
+.vertical-divider {
+  width: 1px;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.12);
+  align-self: center;
+}
+
+.logout-btn {
+  color: var(--color-danger);
+}
+.logout-btn:hover {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-color: rgba(244, 63, 94, 0.2);
+}
+
+/* Botão Voltar como Card */
+.btn-back-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.btn-back-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transform: translateX(-2px);
+}
+.btn-back-card svg {
+  transition: transform 0.2s ease;
+}
+.btn-back-card:hover svg {
+  transform: translateX(-2px);
+}
+
+.page-title-badge {
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.nav-btn-premium-compact {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  border-radius: 10px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 550;
+  transition: all 0.2s ease;
+}
+.nav-btn-premium-compact:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.logout-btn-custom {
+  color: var(--color-danger);
+}
+.logout-btn-custom:hover {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-color: rgba(244, 63, 94, 0.2);
+}
+
+.logout-btn-compact {
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+.logout-btn-compact:hover {
+  background: var(--color-danger-bg);
+}
+</style>

@@ -1,8 +1,18 @@
 <template>
-  <div class="container">
-    <HeaderComponent v-if="!isLoginPage" @change-view="setView" />
+  <div :class="isLoginPage ? 'login-wrapper' : 'container-layout'">
+    <HeaderComponent
+      v-if="!isLoginPage"
+      :current-view="currentView"
+      @change-view="setView"
+    />
     <div class="content">
-      <component :is="currentComponent" @login-success="onLoginSuccess" @change-view="setView" />
+      <component
+        :is="currentComponent"
+        :filter-params="filterParams"
+        @login-success="onLoginSuccess"
+        @change-view="setView"
+        @clear-filter-params="clearFilterParams"
+      />
     </div>
     <FooterComponent v-if="!isLoginPage" />
   </div>
@@ -27,6 +37,7 @@ export default {
   },
   setup() {
     const currentView = ref('Login');
+    const filterParams = ref(null);
 
     const views = {
       Login: LoginView,
@@ -38,10 +49,17 @@ export default {
     const currentComponent = computed(() => views[currentView.value] || LoginView);
     const isLoginPage = computed(() => currentView.value === 'Login');
 
-    const setView = (viewName) => {
+    const setView = (viewName, params = null) => {
       if (views[viewName]) {
         currentView.value = viewName;
+        if (params) {
+          filterParams.value = params;
+        }
       }
+    };
+
+    const clearFilterParams = () => {
+      filterParams.value = null;
     };
 
     const onLoginSuccess = () => {
@@ -76,7 +94,10 @@ export default {
     return {
       isLoginPage,
       currentComponent,
+      currentView,
+      filterParams,
       setView,
+      clearFilterParams,
       onLoginSuccess,
     };
   }
@@ -85,27 +106,32 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-  margin-top: 10px;
-  margin: 5px;
-  padding: 5px;
+}
+
+.container-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
 }
 
 .content {
-  padding-top: 50px;
-}
-
-.container {
-  margin: 0 auto;
-  padding: 20px;
-  border-radius: 10px;
+  padding-top: 2rem;
 }
 
 h2 {
   text-align: center;
-
+  font-weight: 700;
+  margin-bottom: 2rem;
 }
 </style>
