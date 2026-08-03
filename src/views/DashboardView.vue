@@ -115,7 +115,7 @@ Você não possui nenhuma parcela em atraso no momento. Continue assim!
 </template>
 
 <script>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, onActivated, computed } from "vue";
 import { useToast } from "vue-toastification";
 import supabase from "@/utils/supabase";
 
@@ -125,8 +125,17 @@ export default {
   setup(props, { emit }) {
     const toast = useToast();
     const overdueAccounts = ref({});
+    const isFirstMount = ref(true);
 
     onMounted(fetchOverdueAccounts);
+
+    onActivated(() => {
+      if (isFirstMount.value) {
+        isFirstMount.value = false;
+        return;
+      }
+      fetchOverdueAccounts();
+    });
 
     async function fetchOverdueAccounts() {
       try {

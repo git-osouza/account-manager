@@ -6,13 +6,15 @@
       @change-view="setView"
     />
     <div class="content">
-      <component
-        :is="currentComponent"
-        :filter-params="filterParams"
-        @login-success="onLoginSuccess"
-        @change-view="setView"
-        @clear-filter-params="clearFilterParams"
-      />
+      <KeepAlive exclude="LoginView">
+        <component
+          :is="currentComponent"
+          :filter-params="filterParams"
+          @login-success="onLoginSuccess"
+          @change-view="setView"
+          @clear-filter-params="clearFilterParams"
+        />
+      </KeepAlive>
     </div>
     <FooterComponent v-if="!isLoginPage" />
   </div>

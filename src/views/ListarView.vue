@@ -474,7 +474,7 @@ Nenhuma conta encontrada para o mês e ano selecionados.
 
 <script>
 import supabase from "@/utils/supabase";
-import { computed, ref, watch, reactive, onMounted } from "vue";
+import { computed, ref, watch, reactive, onMounted, onActivated } from "vue";
 import { useToast } from "vue-toastification";
 
 export default {
@@ -488,6 +488,7 @@ export default {
     const loading = ref(true);
     const error = ref(null);
     const accounts = ref([]);
+    const isFirstMount = ref(true);
     const monthlySalary = ref(0);
     const previousMonthBalance = ref(0);
     const totalAccounts = ref(0);
@@ -702,6 +703,16 @@ export default {
         applyFilterParams();
       } else {
         setMonthlySalaryToMonth(selectedMonth.value);
+        fetchAccounts();
+      }
+    });
+
+    onActivated(() => {
+      if (isFirstMount.value) {
+        isFirstMount.value = false;
+        return;
+      }
+      if (!props.filterParams) {
         fetchAccounts();
       }
     });
