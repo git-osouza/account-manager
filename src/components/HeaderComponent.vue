@@ -40,8 +40,16 @@ class="nav-btn-premium"
             <span class="btn-label d-none d-md-inline">Nova Conta</span>
             <span class="btn-label d-inline d-md-none">Cadastrar</span>
           </button>
-          
 
+          <button
+            :class="['nav-btn-premium', { active: currentView === 'Relatorio' }]"
+            @click.prevent="$emit('change-view','Relatorio')"
+          >
+            <span class="btn-icon">📈</span>
+            <span class="btn-label d-none d-md-inline">Relatório Pluggy</span>
+            <span class="btn-label d-inline d-md-none">Pluggy</span>
+          </button>
+          
           <span class="vertical-divider mx-1" />
           
           <button
