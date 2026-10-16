@@ -230,7 +230,14 @@
             <div
               v-for="(tx, index) in paginatedTransactions"
               :key="tx.id || index"
+              class="transaction-item"
+            >
+            <div
               class="transaction-row d-flex align-items-center gap-3 px-4 py-3"
+              role="button"
+              tabindex="0"
+              @click="toggleDetails(tx.id || index)"
+              @keyup.enter="toggleDetails(tx.id || index)"
             >
               <div :class="['tx-icon-wrapper', tx.type === 'CREDIT' ? 'credit' : 'debit']">
                 <span>{{ tx.type === 'CREDIT' ? '↑' : '↓' }}</span>
@@ -255,6 +262,18 @@
                   {{ tx.type === 'CREDIT' ? '+' : '-' }}{{ formattedValue(Math.abs(tx.amount)) }}
                 </span>
               </div>
+
+              <span class="tx-chevron">{{ expandedId === (tx.id || index) ? '▲' : '▼' }}</span>
+            </div>
+
+            <div v-if="expandedId === (tx.id || index)" class="tx-details px-4 py-3">
+              <div class="row g-3">
+                <div v-for="field in detailFields(tx)" :key="field.label" class="col-sm-6 col-lg-4">
+                  <span class="detail-label">{{ field.label }}</span>
+                  <div class="detail-value">{{ field.value }}</div>
+                </div>
+              </div>
+            </div>
             </div>
 
             <div v-if="filteredTransactions.length === 0" class="text-center py-5">
@@ -281,7 +300,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useToast } from 'vue-toastification';
 import {
   fetchItems,
@@ -310,8 +329,12 @@ export default {
     // Filtros
     const searchQuery = ref('');
     const selectedType = ref('ALL');
-    const dateFrom = ref('');
-    const dateTo = ref('');
+    // Padrão: mês corrente (do dia 1 ao último dia)
+    const toISODate = (d) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const today = new Date();
+    const dateFrom = ref(toISODate(new Date(today.getFullYear(), today.getMonth(), 1)));
+    const dateTo = ref(toISODate(new Date(today.getFullYear(), today.getMonth() + 1, 0)));
     const currentPage = ref(1);
     const pageSize = 20;
 
@@ -378,7 +401,10 @@ export default {
       errorTx.value = null;
       currentPage.value = 1;
       try {
-        transactions.value = await fetchAllTransactions();
+        transactions.value = await fetchAllTransactions({
+          from: dateFrom.value || undefined,
+          to: dateTo.value || undefined,
+        });
       } catch (err) {
         console.error('[Pluggy] Erro ao buscar transações:', err);
         errorTx.value = err.message;
@@ -387,6 +413,9 @@ export default {
         loadingTx.value = false;
       }
     }
+
+    // Mudou o período → busca de novo na Pluggy
+    watch([dateFrom, dateTo], () => loadTransactions());
 
     onMounted(async () => {
       await loadItems();
@@ -443,6 +472,58 @@ export default {
       return new Date(dateStr).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
+    const expandedId = ref(null);
+
+    function toggleDetails(id) {
+      expandedId.value = expandedId.value === id ? null : id;
+    }
+
+    function detailFields(tx) {
+      const fields = [];
+      const add = (label, value) => {
+        if (value !== undefined && value !== null && value !== '') fields.push({ label, value });
+      };
+      const money = (v) => (typeof v === 'number' ? formattedValue(v) : v);
+      const person = (p) => p && [p.name, p.documentNumber?.value].filter(Boolean).join(' · ');
+
+      add('Descrição original', tx.descriptionRaw);
+      add('Data', tx.date && new Date(tx.date).toLocaleString('pt-BR'));
+      add('Status', tx.status === 'PENDING' ? 'Pendente' : tx.status === 'POSTED' ? 'Efetivada' : tx.status);
+      add('Categoria', tx.category);
+      add('Tipo de operação', tx.operationType);
+      add('Conta', [tx.institutionName, tx.accountName].filter(Boolean).join(' · '));
+      add('Saldo após a transação', money(tx.balance));
+      if (tx.currencyCode && tx.currencyCode !== 'BRL') add('Moeda', tx.currencyCode);
+
+      const m = tx.merchant;
+      if (m) {
+        add('Estabelecimento', m.name || m.businessName);
+        add('Razão social', m.businessName !== m.name ? m.businessName : null);
+        add('CNPJ', m.cnpj);
+        add('Categoria do estabelecimento', m.category);
+      }
+
+      const c = tx.creditCardMetadata;
+      if (c) {
+        if (c.totalInstallments > 1) add('Parcela', `${c.installmentNumber}/${c.totalInstallments}`);
+        add('Valor total da compra', money(c.totalAmount));
+        add('Data da compra', c.purchaseDate && new Date(c.purchaseDate).toLocaleDateString('pt-BR'));
+        add('Final do cartão', c.cardNumber);
+      }
+
+      const pd = tx.paymentData;
+      if (pd) {
+        add('Pagador', person(pd.payer));
+        add('Recebedor', person(pd.receiver));
+        add('Forma de pagamento', pd.paymentMethod);
+        add('Motivo', pd.reason);
+        add('Referência', pd.referenceNumber);
+      }
+
+      add('ID da transação', tx.id);
+      return fields;
+    }
+
     function statusLabel(status) {
       const map = {
         UPDATED: '✅ Atualizado',
@@ -463,6 +544,7 @@ export default {
       currentPage, totalPages,
       totalCredits, totalDebits, balance, creditCount, debitCount,
       formattedValue, formatDate, statusLabel,
+      expandedId, toggleDetails, detailFields,
     };
   },
 };
@@ -657,8 +739,13 @@ export default {
 .transactions-list::-webkit-scrollbar { width: 5px; }
 .transactions-list::-webkit-scrollbar-thumb { background-color: rgba(99,102,241,0.3); border-radius: 99px; }
 
-.transaction-row { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background-color 0.15s ease; }
-.transaction-row:last-child { border-bottom: none; }
+.transaction-item { border-bottom: 1px solid rgba(255,255,255,0.04); }
+.transaction-item:last-child { border-bottom: none; }
+.transaction-row { cursor: pointer; transition: background-color 0.15s ease; }
+.tx-chevron { font-size: 0.65rem; color: var(--text-secondary); width: 1rem; text-align: center; }
+.tx-details { background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.04); }
+.detail-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+.detail-value { font-size: 0.85rem; color: #fff; word-break: break-word; }
 .transaction-row:hover { background: rgba(255,255,255,0.025); }
 
 .tx-icon-wrapper { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; flex-shrink: 0; }

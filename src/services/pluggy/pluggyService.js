@@ -171,9 +171,10 @@ export async function fetchTransactions(accountId, options = {}) {
 /**
  * Busca todas as transações de todos os items e contas disponíveis,
  * retornando uma lista plana ordenada da mais recente para a mais antiga.
+ * @param {object} options - { from, to } (yyyy-mm-dd)
  * @returns {Promise<Array>}
  */
-export async function fetchAllTransactions() {
+export async function fetchAllTransactions(options = {}) {
   const items = await fetchItems();
 
   if (!items.length) return [];
@@ -184,7 +185,7 @@ export async function fetchAllTransactions() {
     const accounts = await fetchAccounts(item.id);
 
     for (const account of accounts) {
-      const { results } = await fetchTransactions(account.id);
+      const { results } = await fetchTransactions(account.id, options);
 
       results.forEach(tx => {
         allTransactions.push({
